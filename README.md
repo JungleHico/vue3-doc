@@ -266,7 +266,7 @@ export default {
 - `ref` 用于对基本值（例如，字符串）创建独立响应式值，**如果要访问或修改变量的值，则需要通过 `.value`**；
 - `reactive` 用于对一个对象创建响应式状态。
 
-```html
+```vue
 <template>
   <p>{{ count }}</p>
   <p>{{ person.name }}</p>
@@ -330,7 +330,7 @@ export default {
 
 在 Vue 3 中，可以在 `setup` 中创建和返回独立的方法：
 
-```html
+```vue
 <template>
   <p>count: {{ count }}</p>
   <button @click="onIncrease">+</button>
@@ -394,7 +394,7 @@ export default {
 
 在 Vue 3 中，我们可以在 `setup` 中使用独立的 `computed` 函数来创建计算属性，`computed` 函数接受一个回调函数，返回一个只读的响应式引用，与 `ref` 类似，**我们需要通过 `.value` 访问计算属性的值**：
 
-```html
+```vue
 <template>
   <p>count: {{ count }}</p>
   <p>doubleCount: {{ doubleCount }}</p>
@@ -531,7 +531,7 @@ export default {
 1. 需要 inject 的属性名
 2. 默认值（可选）
 
-```html
+```vue
 <!-- ParentComponent.vue -->
 <template>
   <child-component></child-component>
@@ -555,7 +555,7 @@ export default {
 </script>
 ```
 
-```html
+```vue
 <!-- ChildComponent.vue -->
 <template>
   <p>name: {{ user.name }}</p>
@@ -583,7 +583,7 @@ export default {
 
 为了增加 `provide` 值和 `inject` 值之间的响应性，我们可以在 `provide` 值时使用 `ref` 或 `reactive`。
 
-```html
+```vue
 <!-- ParentComponent.vue -->
 <template>
   <child-component></child-component>
@@ -615,7 +615,7 @@ export default {
 
 为了方便维护，建议将对响应式属性的所有修改限制在定义 `provide` 的组件内部。如果需要在注入数据的组件内部更新 `inject` 的数据，建议 `provide` 一个方法来负责改变响应式属性。除此之外，对 `provide` 的属性使用 `readonly`，可以确保数据不会被 `inject` 组件直接修改。
 
-```html
+```vue
 <!-- ParentComponent.vue -->
 <template>
   <child-component></child-component>
@@ -648,13 +648,7 @@ export default {
 
 
 
-### 9. setup 语法糖
-
-待续
-
-
-
-### 10. 实战：购物车
+### 9. 实战：购物车
 
 ![图片](./docs/images/shopping-cart.png)
 
@@ -707,7 +701,7 @@ export default {
 
 创建 DOM 结构：
 
-```html
+```vue
 <template>
   <table>
     <thead>
@@ -962,7 +956,7 @@ export default {
 }
 ```
 
-```html
+```vue
 <template>
   <child-component @open="onOpen"></child-component>
 </template>
@@ -987,7 +981,7 @@ Vue 3 中自定义组件 `v-model` 的变化：
 
 ### 默认 prop 和事件名称
 
-```html
+```vue
 <!-- Vue 2 -->
 <child-component v-model="pageTitle" />
 
@@ -996,7 +990,7 @@ Vue 3 中自定义组件 `v-model` 的变化：
 <child-component :value="pageTitle" @input="pageTitle = $event" />
 ```
 
-```html
+```vue
 <!-- Vue 3 -->
 <child-component v-model="pageTitle" />
 
@@ -1012,7 +1006,7 @@ Vue 3 中自定义组件 `v-model` 的变化：
 
 ### 修改 prop 和事件名称
 
-```html
+```vue
 <!-- Vue 2 -->
 
 <!-- ChildComponent.vue -->
@@ -1037,7 +1031,7 @@ export default {
 <child-component :title="pageTitle" @change="pageTitle = $event" />
 ```
 
-```html
+```vue
 <!-- Vue 3 -->
 
 <!-- ParentComponent.vue -->
@@ -1060,7 +1054,7 @@ Vue 2：
 this.$emit('update:title', newValue)
 ```
 
-```html
+```vue
 <!-- ParentComponent.vue -->
 <child-component :title="pageTitle" @update:title="pageTitle = $event" />
 
@@ -1071,7 +1065,7 @@ this.$emit('update:title', newValue)
 
 Vue 3：
 
-```html
+```vue
 <child-component
   :title="pageTitle"
   @update:title="pageTitle = $event"
@@ -1081,6 +1075,253 @@ Vue 3：
 
 <child-component v-model:title="pageTitle" />
 ```
+
+
+
+## setup 语法糖
+
+`<script setup>` 是在单文件组件 (SFC) 中使用组合式 API 的编译时语法糖。相比于普通的 `<script>` 语法，它具有更多优势：
+
+- 更少的样板内容，更简洁的代码。
+- 能够使用纯 Typescript 声明 `props` 和抛出事件。
+- 更好的运行时性能 (其模板会被编译成与其同一作用域的渲染函数，没有任何的中间代理)。
+- 更好的 IDE 类型推断性能 (减少语言服务器从代码中抽离类型的工作)。
+
+
+
+
+### ESLint 支持
+
+ESLint 对 `setup` 语法糖的支持并不友好，需要将 `no-unused-vars` 规则关闭：
+
+```diff
+// .eslintrc.js
+module.exports = {
+  rules: {
+    'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
+    'no-debugger': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
+    'space-before-function-paren': ['error', 'never'],
++   'no-unused-vars': 'off'
+  }
+}
+```
+
+
+
+
+### 数据和方法
+
+`<script setup>` 中定义的数据和方法，包含 `import` 导入的变量，都能在模板中直接使用：
+
+```vue
+<template>
+  <div>{{ sum(1, 2) }}</div>
+  <div>{{ count }}</div>
+  <div>{{ refCount }}</div>
+  <button @click="onIncrease">+</button>
+</template>
+
+<script setup>
+import { ref } from 'vue'
+import { sum } from '@/utils/sum'
+
+const count = 0
+const refCount = ref(0)
+const onIncrease = () => {
+  refCount.value++
+}
+</script>
+```
+
+
+
+### 使用组件
+
+`<script setup>` 范围里的值也能被直接作为自定义组件的标签名使用：
+
+```vue
+<template>
+  <child-component></child-component>
+</template>
+
+<script setup>
+import ChildComponent from './ChildComponent.vue'
+</script>
+
+<style scoped>
+
+</style>
+```
+
+
+
+### defineProps 和 defineEmits
+
+在 `<script setup>` 中必须使用 `defineProps` 和 `defineEmits` API 来声明 `props` 和 `emits` ，它们具备完整的类型推断并且在 `<script setup>` 中是直接可用的：
+
+```vue
+<!-- ChildComponent.vue -->
+<template>
+  <div>title：{{ title }}</div>
+  <div>count: {{ count }}</div>
+  <button @click="onChange">emit</button>
+</template>
+
+<script setup>
+const props = defineProps({
+  title: String,
+  count: {
+    type: Number,
+    required: true
+  }
+})
+
+const emit = defineEmits(['change'])
+
+const onChange = () => {
+  emit('change', 123)
+}
+</script>
+```
+
+```vue
+<!-- ParentComponent.vue -->
+<template>
+  <child-component
+    title="标题"
+    :count="1"
+    @change="onChange">
+  </child-component>
+</template>
+
+<script setup>
+import ChildComponent from './ChildComponent.vue'
+
+const onChange = value => {
+  console.log('接收子组件数据', value)
+}
+</script>
+```
+
+- `defineProps` 接收一个 `props` 对象作为参数，和组件的 `props` 选项保持一致。
+- `defineEmits` 接收一个 `emits` 数组作为参数，和组件的 `emits` 选项保持一致，返回值用法和 `setup` 函数的第二个参数解构出来的 `emit` 一致。
+
+`defineProps` 和 `defineEmits` 都只在 `<script setup>` 中才能使用的**编译器宏**，不需要导入且会随着 `<script setup>` 处理过程一同被编译掉。使用 ESlint 时，需要将这两个变量在 `globals` 中进行声明：
+
+```js
+// .eslintrc.js
+module.exports = {
+  globals: {
+    defineProps: 'readonly',
+    defineEmits: 'readonly'
+  }
+}
+```
+
+
+
+#### TypeScript 中使用
+
+在 TypeScript 中，可以为 `defineProps` 和 `defineEmits` 使用类型声明，代替参数传递，注意这两种方式不能同时使用，否则编译会出错。修改上面的例子：
+
+```diff
+  <!-- ChildComponent.vue -->
+  <template>
+    <div>title：{{ title }}</div>
+    <div>count: {{ count }}</div>
+    <button @click="onChange">emit</button>
+  </template>
+
+- <script setup>
++ <script setup lang="ts">
+- const props = defineProps({
+-   title: String,
+-   count: {
+-     type: Number,
+-     required: true
+-   }
+- })
++ type Props = {
++   title?: string,
++   count: number
++ }
++ const props = defineProps<Props>()
+
+- const emit = defineEmits(['change'])
++ type Emits = {
++   (event: 'change', value: number): void
++ }
++ const emit = defineEmits<Emits>()
+
+  const onChange = () => {
+    emit('change', 123)
+  }
+  </script>
+```
+
+```diff
+  <!-- ParentComponent.vue -->
+  <template>
+    <child-component
+      title="标题"
+      :count="1"
+      @change="onChange">
+    </child-component>
+  </template>
+
+  <script setup>
+  import ChildComponent from './ChildComponent.vue'
+
+- const onChange = value => {
++ const onChange = (value: number) => {
+    console.log('接收子组件数据', value)
+  }
+  </script>
+```
+
+仅限类型的 `defineProps` 声明的不足之处在于，它没有可以给 props 提供默认值的方式。为了解决这个问题，官方提供了 `withDefaults` 编译器宏：
+
+```diff
+  type Props = {
+    title?: string,
+    count: number
+  }
+- const props = defineProps<Props>()
++ const props = withDefaults(defineProps<Props>(), {
++   title: '',
++   count: 0
++ })
+```
+
+> 若项目中用到 ESLint，同样需要在配置文件中的 `globals` 属性中声明 `withDefaults` 。
+
+
+
+### 通过另一个 `<script>` 指定组件选项
+
+如果需要为当前组件指定某些选项，例如组件名称，则需要定义另外一个 `<script>` 并导出：
+
+```vue
+<template>
+  <child-component></child-component>
+</template>
+
+<script setup>
+import ChildComponent from './ChildComponent.vue'
+</script>
+
+<script>
+export default {
+  name: 'ParentComponent'
+}
+</script>
+
+<style scoped>
+
+</style>
+```
+
+> 一个 SFC 只能有一个 `<script>` 标签带 `setup` 属性。
 
 
 
@@ -1396,7 +1637,7 @@ export const useCounterStore = defineStore('counter', {
 
 在组件中使用：
 
-```html
+```vue
 <template>
   <div>{{ counterStore.counter }}</div>
 </template>
@@ -1421,7 +1662,7 @@ export default {
 
 和 Vue 3 中对响应式对象解构类似，对 `store` 使用解构语法，也会使状态值失去响应性，解决办法是引入 `storeToRefs` 方法：
 
-```html
+```vue
 <template>
   <div>{{ counter }}</div>
 </template>
@@ -1470,7 +1711,7 @@ export default {
 
 `getters` 相当于 store 中 `state` 的计算属性，声明一个函数，第一个参数是 `state`，函数返回属性值。和 Vue 2 实例类似，store 中 `this` 指代 store 实例，因此可以通过 `this` 访问属性和方法。
 
-```html
+```vue
 <template>
   <div>{{ counter }}</div>
   <div>{{ doubleCount }}</div>
@@ -1519,7 +1760,7 @@ export default {
   })
 ```
 
-```html
+```vue
 <template>
   <div>{{ counter }}</div>
   <button @click="onIncreaseOne">+</button>
@@ -1700,7 +1941,7 @@ app.use(createPinia()).use(router).mount('#app')
 
 ### 3. 创建底部导航组件
 
-```html
+```vue
 <!-- src/components/BottomTabBar.vue -->
 <template>
   <van-tabbar v-model="activeIndex"  @change="onChange">
@@ -1757,7 +1998,7 @@ export default {
 
 ### 4. 页面基本布局
 
-```html
+```vue
 <!-- src/App.vue -->
 
 <template>
@@ -1771,7 +2012,7 @@ export default {
 
 之前我们在路由中定义了 `meta.keepAlive`，需要结合 Vue 内置组件 `<keep-alive>` 来缓存组件：
 
-```html
+```vue
 <template>
   <router-view v-slot="{ Component }">
     <keep-alive :include="cachedViewsName">
@@ -1797,7 +2038,7 @@ export default {
   setup() {
     const cachedViewsName = reactive([])
     const viewsName = routes.filter(route => route.meta?.keepAlive).map(route => route.name)
-    cachedViewsName.splice(0, 0, ...viewsName)
+    cachedViewsName.push(...viewsName)
                                         
     return {
       cachedViewsName
@@ -2013,7 +2254,7 @@ export default router
 
 ### 7. 新闻（列表）页
 
-```html
+```vue
 <!-- src/views/news/Index.vue -->
 <template>
   <van-pull-refresh v-model="refreshing" @refresh="onRefresh">
@@ -2070,7 +2311,7 @@ export default {
 
       try {
         const res = await getNews(start, num)
-        list.splice(list.length, 0, ...res.result.list)
+        list.push(...res.result.list)
         start += num
       } catch (error) {
         finished.value = true
@@ -2133,7 +2374,7 @@ export const useNewsStore = defineStore('news', {
 
 ### 8. 新闻详情页
 
-```html
+```vue
 <!-- src/views/news/Detail.vue -->
 <template>
   <div v-if="news" class="container">
@@ -2174,7 +2415,7 @@ export default {
 
 ### 9. 每日一笑
 
-```html
+```vue
 <!-- src/views/Joke.vue -->
 <template>
   <div class="container">
@@ -2204,7 +2445,7 @@ export default {
       const time = format(subDays(new Date(), 1), 'yyyy-MM-dd')
       const res = await getJokes(time)
       const jokeList = res.showapi_res_body.contentlist
-      jokes.splice(0, 0, ...jokeList)
+      jokes.push(...jokeList)
     }
     // 格式化时间
     const formatTime = time => {
@@ -2227,7 +2468,7 @@ export default {
 
 ### 10. 404 页面 
 
-```html
+```vue
 <!-- src/views/Error404.vue -->
 <template>
   <van-empty image="error" description="抱歉，你所访问的页面不存在">
@@ -2257,4 +2498,216 @@ export default {
 
 ## 引入 TypeScript
 
-待续
+### TypeScript 教程
+
+- [为什么要用TS](https://mp.weixin.qq.com/s?__biz=MzU1OTgxNDQ1Nw==&mid=2247490348&idx=1&sn=422857d89edf45103f273710444e6796&chksm=fc10d97acb67506c8b2cf7da8d06c6cd77103a7aee51a8588585acaf63e4081e18c608e962bc&mpshare=1&scene=1&srcid=0216LGyzkQtleayJgqlWYhgp&sharer_sharetime=1645085205346&sharer_shareid=eabbe011caf7b25d57818c0c2334124b&version=4.0.0.6007&platform=win#rd)
+
+
+- [TypeScript中文网](https://www.tslang.cn/index.html)
+- [TypeScript 入门教程](http://ts.xcatliu.com/)
+
+
+
+### 创建 Vue 3 + TypeScript 项目
+
+使用 Vue CLI，创建 Vue 3 项目，并引入 TypeScript：
+
+![vue-cli-ts-preset](./docs/images/vue-cli-ts-preset.png)
+
+
+
+### 创建 单文件组件（SFC）
+
+```vue
+<script lang="ts">
+import { defineComponent } from 'vue'
+
+export default defineComponent({
+
+})
+</script>
+```
+
+`<script>` 标签中需要添加 `lang="ts"` 属性，才能使用 TS 编写代码。
+
+使用 `defineComponent` 方法创建组件，以启用 TS 类型推断。
+
+> 引入 SFC 时，需要指定 `.vue` 文件后缀。
+
+
+
+### 安装 Volar 插件
+
+Volar 为模板表达式、组件 prop，甚至是插槽验证提供了语法高亮和智能提示。官方推荐使用 Volar，特别是当项目中使用 TypeScript 时。
+
+![volar](./docs/images/volar.png)
+
+下载安装前，需要先禁用 Vetur 插件。
+
+
+
+###使用场景
+
+#### 类型注解约束变量
+
+对于简单数据，TS 可以进行类型推断；对于复杂数据，例如通过 `reactive` 创建的响应式对象，可以使用 `interface` 定义数据结构，或者 `type` 定义类型关系，并通过类型注解添加约束：
+
+```js
+import { defineComponent, reactive } from 'vue'
+
+type User = {
+  name: string,
+  age: number
+}
+
+const user = reactive<User>({
+  name: 'Tom',
+  age: 18
+})
+// 或
+// const user: User = reactive({
+//   name: 'Tom',
+//   age: 18
+// })
+
+```
+
+如果其他页面或者组件需要用到 `User` ，建议将 `User` 封装起来，供多个页面使用：
+
+```js
+// src/types/User.ts
+type User = {
+  name: string,
+  age: number
+}
+
+export default User
+```
+
+```diff
++ import User from '@/types/User'
+
+- interface User {
+-   name: string,
+-   age: number
+- }
+
+
+const user = reactive<User>({
+  name: 'Tom',
+  age: 18
+})
+```
+
+
+
+#### 为函数参数和返回值添加类型
+
+对于函数，特别是导出给外部使用的，为函数参数和返回值添加类型注解，可以方便函数的使用以及避免函数参数类型错误：
+
+```js
+/** 计算数值a和b的和 */
+const sum = (a: number, b: number) => {
+  return a + b
+}
+```
+
+![ts_function](./docs/images/ts_function.png)
+
+调用函数时，编辑器会有函数参数和返回值说明，这里的返回值通过类型推断得到。除此之外，还可以得到函数的注释说明。
+
+
+
+#### 封装 axios 请求
+
+封装请求：
+
+```js
+// src/api/utils/http.ts
+import axios, { AxiosRequestConfig, AxiosResponse, AxiosPromise } from 'axios'
+
+const http = axios.create({
+  baseURL: 'http://xxx',
+  timeout: 10000
+})
+
+// 请求拦截
+http.interceptors.request.use(
+  (config: AxiosRequestConfig) => {
+    const token = localStorage.getItem('token')
+    if (config.headers && token) {
+      config.headers.Authorization = `Bearer ${token}`
+    }
+    return config
+  },
+  (error: Error) => Promise.reject(error)
+)
+
+// 响应拦截
+http.interceptors.response.use(
+  (response: AxiosResponse) => {
+    if (response.data.code === '0') {
+      return response.data.result
+    }
+    return Promise.reject(new Error(response.data.msg))
+  },
+  (error: Error) => {
+    return Promise.reject(error)
+  }
+)
+
+// export default http
+
+// 封装GET请求
+export const get = (url: string, params = {}, config: AxiosRequestConfig = {}): AxiosPromise => {
+  return http({
+    url,
+    method: 'GET',
+    params,
+    ...config
+  })
+}
+
+// 封装POST请求
+export const post = (url: string, data = {}, config: AxiosRequestConfig = {}): AxiosPromise => {
+  return http({
+    url,
+    method: 'POST',
+    data,
+    ...config
+  })
+}
+```
+
+定义接口：
+
+```js
+// src/api/user.ts
+import { AxiosPromise } from 'axios'
+import { post } from './utils/http'
+
+export const login = (data = {}): AxiosPromise => post('/user/login', data)
+```
+
+还可以为请求参数的属性添加约束：
+
+```diff
+  // src/api/user.ts
+  import { AxiosPromise } from 'axios'
+  import { post } from './utils/http'
+
++ type LoginParams = {
++   account: string,
++   password: string
++ }
+
+- export const login = (data = {}): AxiosPromise => post('/user/login', data)
++ export const login = (data: LoginParams): AxiosPromise => post('/user/login', data)
+```
+
+
+
+#### setup 语法糖中使用 defineProps 和 defineEmits
+
+参上上文 《setup 语法糖》中的相关内容。
+
