@@ -2546,7 +2546,7 @@ Volar 为模板表达式、组件 prop，甚至是插槽验证提供了语法高
 
 
 
-###使用场景
+### 使用场景
 
 #### 类型注解约束变量
 
@@ -2709,5 +2709,5 @@ export const login = (data = {}): AxiosPromise => post('/user/login', data)
 
 #### setup 语法糖中使用 defineProps 和 defineEmits
 
-参上上文 《setup 语法糖》中的相关内容。
+参考上文 《setup 语法糖》中的相关内容。
 
