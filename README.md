@@ -451,7 +451,7 @@ watch(
 
 
 
-####侦听多个数据源
+#### 侦听多个数据源
 
 `watch` 还可以使用数组同时侦听多个源，第一个参数是监听数据的数组，第二参数仍然是回调函数，只不过回调函数的两个参数都是数组：
 
@@ -644,7 +644,7 @@ export default {
 </script>
 ```
 
-在复杂的场景中，多个组件之间相互影响状态，基于 `props` 或者 `provide/inject` 的单向数据流就会显示捉襟见肘，而且维护起来也比较麻烦，这种场景建议使用 `Vuex` 进行集中式状态管理。
+在复杂的场景中，多个组件之间相互影响状态，基于 `props` 或者 `provide/inject` 的单向数据流就会显示捉襟见肘，而且维护起来也比较麻烦，这种场景建议使用 `Vue/Pinia` 进行集中式状态管理。
 
 
 
@@ -979,7 +979,7 @@ Vue 3 中自定义组件 `v-model` 的变化：
 
 
 
-### 默认 prop 和事件名称
+### 1. 默认 prop 和事件名称
 
 ```vue
 <!-- Vue 2 -->
@@ -1004,7 +1004,7 @@ Vue 3 中自定义组件 `v-model` 的变化：
 
 
 
-### 修改 prop 和事件名称
+### 2. 修改 prop 和事件名称
 
 ```vue
 <!-- Vue 2 -->
@@ -1044,7 +1044,7 @@ export default {
 
 
 
-### 替代 .sync 修饰符
+### 3. 替代 .sync 修饰符
 
 Vue 2：
 
@@ -1090,7 +1090,7 @@ Vue 3：
 
 
 
-### ESLint 支持
+### 1. ESLint 支持
 
 ESLint 对 `setup` 语法糖的支持并不友好，需要将 `no-unused-vars` 规则关闭：
 
@@ -1109,7 +1109,7 @@ module.exports = {
 
 
 
-### 数据和方法
+### 2. 数据和方法
 
 `<script setup>` 中定义的数据和方法，包含 `import` 导入的变量，都能在模板中直接使用：
 
@@ -1135,7 +1135,7 @@ const onIncrease = () => {
 
 
 
-### 使用组件
+### 3. 使用组件
 
 `<script setup>` 范围里的值也能被直接作为自定义组件的标签名使用：
 
@@ -1155,7 +1155,7 @@ import ChildComponent from './ChildComponent.vue'
 
 
 
-### defineProps 和 defineEmits
+### 4. defineProps 和 defineEmits
 
 在 `<script setup>` 中必须使用 `defineProps` 和 `defineEmits` API 来声明 `props` 和 `emits` ，它们具备完整的类型推断并且在 `<script setup>` 中是直接可用的：
 
@@ -1297,7 +1297,7 @@ module.exports = {
 
 
 
-### 通过另一个 `<script>` 指定组件选项
+### 5. 通过另一个 `<script>` 指定组件选项
 
 如果需要为当前组件指定某些选项，例如组件名称，则需要定义另外一个 `<script>` 并导出：
 
@@ -1321,7 +1321,7 @@ export default {
 </style>
 ```
 
-> 一个 SFC 只能有一个 `<script>` 标签带 `setup` 属性。
+> 一个 SFC 多个 `<script>` 的 `lang` 值要保持一致（例如都添加 `lang="ts"` 或者都不加），并且只能有一个 `<script>` 标签带 `setup` 属性。
 
 
 
@@ -2498,7 +2498,7 @@ export default {
 
 ## 引入 TypeScript
 
-### TypeScript 教程
+### 1. TypeScript 教程
 
 - [为什么要用TS](https://mp.weixin.qq.com/s?__biz=MzU1OTgxNDQ1Nw==&mid=2247490348&idx=1&sn=422857d89edf45103f273710444e6796&chksm=fc10d97acb67506c8b2cf7da8d06c6cd77103a7aee51a8588585acaf63e4081e18c608e962bc&mpshare=1&scene=1&srcid=0216LGyzkQtleayJgqlWYhgp&sharer_sharetime=1645085205346&sharer_shareid=eabbe011caf7b25d57818c0c2334124b&version=4.0.0.6007&platform=win#rd)
 
@@ -2508,7 +2508,7 @@ export default {
 
 
 
-### 创建 Vue 3 + TypeScript 项目
+### 2. 创建 Vue 3 + TypeScript 项目
 
 使用 Vue CLI，创建 Vue 3 项目，并引入 TypeScript：
 
@@ -2516,7 +2516,7 @@ export default {
 
 
 
-### 创建 单文件组件（SFC）
+### 3. 创建 单文件组件（SFC）
 
 ```vue
 <script lang="ts">
@@ -2536,17 +2536,17 @@ export default defineComponent({
 
 
 
-### 安装 Volar 插件
+### 4. 安装 Volar 插件
 
 Volar 为模板表达式、组件 prop，甚至是插槽验证提供了语法高亮和智能提示。官方推荐使用 Volar，特别是当项目中使用 TypeScript 时。
 
 ![volar](./docs/images/volar.png)
 
-下载安装前，需要先禁用 Vetur 插件。
+下载安装前，需要先禁用 Vetur 插件并重启编辑器。
 
 
 
-### 使用场景
+### 5. 使用场景
 
 #### 类型注解约束变量
 
@@ -2710,4 +2710,490 @@ export const login = (data = {}): AxiosPromise => post('/user/login', data)
 #### setup 语法糖中使用 defineProps 和 defineEmits
 
 参考上文 《setup 语法糖》中的相关内容。
+
+
+
+#### provide/inject
+
+待续。
+
+
+
+#### v-model
+
+待续。
+
+
+
+### 6. unplugin-import-auto 插件
+
+待续。
+
+
+
+## 实战：TodoList
+
+要求基于 Vue 3 和 TypeScript 实现一个 TodoList，包含以下内容：
+
+- 用户通过输入框添加待办项
+- 待办项可以删除和勾选为已完成
+- 显示待办项数量和已完成数量
+- 支持删所有已完成待办项
+
+
+![todo-list](./docs/images/todo-list.png)
+
+
+
+
+#### 1. 引入 reset.css
+
+引入 `reset.css` ，用于覆盖浏览器样式，统一默认样式：
+
+```css
+/* src/styles/reset.css */
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed, 
+figure, figcaption, footer, header, hgroup, 
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 100%;
+  font: inherit;
+  vertical-align: baseline;
+}
+/* HTML5 display-role reset for older browsers */
+article, aside, details, figcaption, figure, 
+footer, header, hgroup, menu, nav, section {
+  display: block;
+}
+body {
+  line-height: 1;
+}
+ol, ul {
+  list-style: none;
+}
+blockquote, q {
+  quotes: none;
+}
+blockquote:before, blockquote:after,
+q:before, q:after {
+  content: '';
+  content: none;
+}
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+```
+
+```diff
+  // src/main.ts
+  import { createApp } from 'vue'
+  import App from './App.vue'
++ import './styles/reset.css'
+
+  createApp(App).mount('#app')
+```
+
+
+
+#### 2. 引入 Element Plus 组件库
+
+首先，安装依赖：
+
+```sh
+npm install element-plus
+```
+
+根据 [Element Plus 文档](https://element-plus.gitee.io/zh-CN/guide/quickstart.html#%E6%8C%89%E9%9C%80%E5%AF%BC%E5%85%A5) ，配置自动按需导入：
+
+```sh
+npm install -D unplugin-vue-components unplugin-auto-import
+```
+
+```js
+// vue.config.js
+/* eslint-disable @typescript-eslint/no-var-requires */
+const AutoImport = require('unplugin-auto-import/webpack')
+const Components = require('unplugin-vue-components/webpack')
+const { ElementPlusResolver } = require('unplugin-vue-components/resolvers')
+
+module.exports = {
+  configureWebpack: {
+    plugins: [
+      AutoImport({
+        resolvers: [ElementPlusResolver()]
+      }),
+      Components({
+        resolvers: [ElementPlusResolver()]
+      })
+    ]
+  }
+}
+```
+
+
+
+#### 3. 自动化导入 Vue 3 组合式 API
+
+通过 `unplugin-auto-import` 插件可以自动导入 Vue 3 的组合式 API，上一步引入 Element Plus 组件库时已经引入了该插件，不过需要修改配置文件：
+
+```diff
+// vue.config.js
+/* eslint-disable @typescript-eslint/no-var-requires */
+const AutoImport = require('unplugin-auto-import/webpack')
+const Components = require('unplugin-vue-components/webpack')
+const { ElementPlusResolver } = require('unplugin-vue-components/resolvers')
+
+module.exports = {
+  configureWebpack: {
+    plugins: [
+      AutoImport({
++     	imports: ['vue'],
++       dts: 'src/auto-imports.d.ts',
+        resolvers: [ElementPlusResolver()]
+      }),
+      Components({
+        resolvers: [ElementPlusResolver()]
+      })
+    ]
+  }
+}
+```
+
+>  `unplugin-auto-import` 默认会在根路径生成 `auto-imports.d.ts` 配置文件，但是 Vue CLI 生成的 `ts.config.js` 配置文件的`include` 字段默认只包含 `src` 路径和 `tests` 路径，从而导致无法编译成功。因此需要通过 `dts` 指定在 `src` 目录下生成配置文件，或者在 `ts.config.js` 的 `include` 匹配根路径的 `auto-imports.d.ts` 文件。
+
+如果使用 ESlint，需要将 `no-undef` 规则关闭，否则会报错。
+
+```diff
+  module.exports = {
+    rules: {
+      'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
+      'no-debugger': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
+      'space-before-function-paren': ['error', 'never'],
++     'no-undef': 'off',
+      '@typescript-eslint/no-explicit-any': 'off'
+    }
+  }
+```
+
+
+
+#### 4. 组件划分
+
+TodoList 可以划分为三部分：
+
+- 顶部的输入框，用于添加待办项
+- 中间的列表，展示所有待办项，支持删除和完成/取消完成操作
+- 底部，包含统计待办项数量和删除已完成待办项的操作
+
+
+
+```vue
+<!-- src/components/TodoList/Index.vue -->
+<template>
+  <el-row class="todo-list">
+    <el-col :offset="8" :span="8">
+      <todo-list-input></todo-list-input>
+      <todo-list-items></todo-list-items>
+      <todo-list-footer></todo-list-footer>
+    </el-col>
+  </el-row>
+</template>
+
+<script setup lang="ts">
+import TodoListInput from './components/TodoListInput.vue'
+import TodoListItems from './components/TodoListItems.vue'
+import TodoListFooter from './components/TodoListFooter.vue'
+</script>
+
+<style scoped>
+.todo-list {
+  margin-top: 32px;
+}
+</style>
+```
+
+
+
+#### 5. 添加数据约束
+
+对于每一条待办项，我们期望以下三个属性：
+
+- `id` ：`string` 类型，通过时间戳生成，用于区分每一条待办项
+- `text` ：`string` 类型，每一条待办项的内容
+- `finished` ：`boolean` 类型，表示待办项是否已完成
+
+```typescript
+// src/components/TodoList/types/TodoListItemType.ts
+type TodoListItemType = {
+  id: string,
+  text: string,
+  finished: boolean,
+}
+
+export default TodoListItemType
+```
+
+定义一个生成 `id` 的工具方法：
+
+```typescript
+// src/components/TodoList/utils/getTodoListItemId.ts
+export default function getTodoListItemId(): string {
+  return (new Date().getTime()) + ''
+}
+```
+
+
+
+#### 6. Pinia 状态管理
+
+TodoList 的数据处理的核心是维护一个数组，该数组需要在几个兄弟组件之间传递，这里采用 Pinia 进行状态管理。
+
+首先，安装 Pinia：
+
+```sh
+npm install pinia
+```
+
+创建和挂载实例：
+
+```diff
+  // src/main.ts
+  import { createApp } from 'vue'
+  import App from './App.vue'
++ import { createPinia } from 'pinia'
+  import './styles/reset.css'
+
+- createApp(App).mount('#app')
++ createApp(App).use(createPinia()).mount('#app')
+```
+
+创建 store：
+
+```typescript
+// src/store/index.ts
+import { defineStore } from 'pinia'
+import TodoListItemType from '@/components/TodoList/types/TodoListItemType'
+import getTodoListItemId from '@/components/TodoList/utils/getTodoListItemId'
+
+// 约束 state
+type TodoListState = {
+  todoList: TodoListItemType[]
+}
+
+export const useTodoListStore = defineStore('todoList', {
+  state: (): TodoListState => {
+    return {
+      todoList: [] // 待办项列表
+    }
+  },
+  actions: {
+    // （从头部）添加待办项
+    addItem(text: string): void {
+      this.todoList.unshift({
+        id: getTodoListItemId(),
+        text,
+        finished: false
+      })
+    },
+    // 修改待办项状态
+    changeItemStatus(id: string, finished: boolean): void {
+      const item = this.todoList.find(todoItem => todoItem.id === id)
+      if (item) {
+        item.finished = finished
+      }
+    },
+    // 删除待办项
+    removeItem(id: string): void {
+      const index = this.todoList.findIndex(listItem => listItem.id === id)
+      if (index >= 0) {
+        this.todoList.splice(index, 1)
+      }
+    },
+    // 删除已完成的待办项
+    removeFinishedItems(): void {
+      this.todoList = this.todoList.filter(item => !item.finished)
+    }
+  }
+})
+```
+
+
+
+#### 7. 顶部输入框
+
+```vue
+<!-- src/components/TodoList/components/TodoListInput.vue -->
+<template>
+  <el-row class="input-wrapper" :gutter="12">
+    <el-col :span="20">
+      <el-input
+        v-model.trim="text"
+        placeholder="请输入待办项"
+        @keydown.enter="onAddItem" />
+    </el-col>
+    <el-col :span="4">
+      <el-button type="primary" @click="onAddItem">添加</el-button>
+    </el-col>
+  </el-row>
+</template>
+
+<script setup lang="ts">
+import { useTodoListStore } from '@/store'
+
+const todoListStore = useTodoListStore()
+
+const text = ref<string>('')
+
+const onAddItem = (): void => {
+  if (text.value !== '') {
+    todoListStore.addItem(text.value)
+    text.value = ''
+  }
+}
+</script>
+
+<style scoped>
+.input-wrapper {
+  padding: 0 12px;
+}
+```
+
+通过 `useTodoListStore` 方法引入 store，使用其中的数据和方法。
+
+和业务相关的几个点：
+
+- 待办项非空才能添加。
+- 待办项添加后清空输入框。
+
+
+- 输入框添加键盘监听事件，按回车也可以添加待办项。
+
+
+
+
+#### 8. 待办项列表
+
+```vue
+<!-- src/components/TodoList/components/TodoListItems.vue -->
+<template>
+  <el-table class="item-table" :data="todoList.reverse()">
+    <el-table-column prop="text" label="内容"></el-table-column>
+    <el-table-column label="操作" header-align="center" align="right">
+      <template #default="{ row }">
+        <el-button
+          :type="row.finished ? 'primary' : 'default'"
+          plain
+          @click="onChangeItem(row)">
+          {{ row.finished ? '取消完成' : '完成' }}
+        </el-button>
+        <el-button type="danger" plain @click="onRemoveItem(row)">删除</el-button>
+      </template>
+    </el-table-column>
+  </el-table>
+</template>
+
+<script setup lang="ts">
+import { useTodoListStore } from '@/store'
+import { storeToRefs } from 'pinia'
+import TodoListItemType from '../types/TodoListItemType'
+
+const todoListStore = useTodoListStore()
+const { todoList } = storeToRefs(todoListStore)
+
+const onChangeItem = (item: TodoListItemType): void => {
+  todoListStore.changeItemStatus(item.id, !item.finished)
+}
+
+const onRemoveItem = (item: TodoListItemType): void => {
+  todoListStore.removeItem(item.id)
+}
+</script>
+
+<style scoped>
+.item-table {
+  margin-top: 12px;
+}
+</style>
+```
+
+点击完成按钮，切换按钮状态，并显示为取消完成。
+
+
+
+#### 9.底部
+
+```vue
+<!-- src/components/TodoList/components/TodoListFooter.vue -->
+<template>
+  <el-row
+    v-if="total"
+    class="footer"
+    justify="space-between"
+    align="middle">
+    <div>已完成：{{ finishedCount }} / {{ total }}</div>
+    <el-button type="danger" @click="onRemoveAll">删除已完成</el-button>
+  </el-row>
+
+  <el-dialog
+    v-model="dialogVisible"
+    title="删除"
+    width="400px">
+    <div>你确定删除所有已完成的内容吗？</div>
+    <template #footer>
+      <div>
+        <el-button @click="dialogVisible = false">取消</el-button>
+        <el-button type="danger" @click="onConfirmRemove">确定</el-button>
+      </div>
+    </template>
+  </el-dialog>
+</template>
+
+<script setup lang="ts">
+import { useTodoListStore } from '@/store'
+import { storeToRefs } from 'pinia'
+import TodoListItemType from '../types/TodoListItemType'
+
+const todoListStore = useTodoListStore()
+const { todoList } = storeToRefs(todoListStore)
+const dialogVisible = ref<boolean>(false) // 是否展示对话框
+
+const total = computed(() => todoList.value.length)
+const finishedCount = computed(() => todoList.value.reduce((count: number, item: TodoListItemType) => {
+  return item.finished ? count + 1 : count
+}, 0))
+
+const onRemoveAll = (): void => {
+  dialogVisible.value = true
+}
+
+const onConfirmRemove = (): void => {
+  todoListStore.removeFinishedItems()
+  dialogVisible.value = false
+}
+</script>
+
+<style scoped>
+.footer {
+  padding: 12px;
+  color: #606266;
+}
+</style>
+```
+
+通过计算属性获取待办项的数量和已完成的数量。
+
+删除已完成的待办项之前，弹出确认对话框。
 
