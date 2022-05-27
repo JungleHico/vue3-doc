@@ -2,11 +2,11 @@
 
 > 该文档假设你对 JavaScript、ES6 和 Vue 2 已具备一定基础。
 
-
-
 ## Vue 3 项目创建
 
-### 1. 安装 Vue CLI 
+### 1. 方式一 Vue CLI
+
+#### 安装 Vue CLI
 
 使用 Vue CLI 创建 Vue 3 项目，需要 Vue CLI 的版本不低于 4.5，运行以下命令检查 Vue CLI 版本：
 
@@ -21,9 +21,7 @@ vue --version
 npm install -g @vue/cli
 ```
 
-
-
-### 2. 创建 vue 3 项目
+#### 创建项目
 
 在项目目录下运行命令：
 
@@ -39,14 +37,39 @@ vue create vue3-project
 
 ![vue-cli-preset2](./docs/images/vue-cli-preset2.png)
 
-
-
-### 3. 运行项目
+#### 运行项目
 
 进入创建的项目所在的目录，运行以下命令启动项目：
 
 ```sh
-npm run build
+npm install
+npm run serve
+```
+
+
+
+### 2. 方式二 Vite
+
+Vite 是官方推荐使用的前端构建工具，参考：[Vite官方文档](https://cn.vitejs.dev)。
+
+首先，通过模板创建项目：
+
+```sh
+npm create vite@latest vue3-project
+```
+
+选择 vue 框架，接着选择是否引入 Typescript。
+
+然后，安装依赖：
+
+```sh
+npm install
+```
+
+最后，运行项目：
+
+```sh
+npm install dev
 ```
 
 
@@ -61,7 +84,7 @@ import Vue from 'vue'
 import App from './App.vue'
 
 new Vue({
-  render: h => h(App)
+  render: (h) => h(App)
 }).$mount('#app')
 
 // Vue 3
@@ -72,8 +95,6 @@ createApp(App).mount('#app')
 ```
 
 `createApp` 方法的第一个参数接收根组件，这个方法返回实例本身，因此可以在后面链式调用其他方法。
-
-
 
 ### 全局 API
 
@@ -96,8 +117,6 @@ app.mixin({
 })
 app.mount('#app')
 ```
-
-
 
 ## 组合式 API
 
@@ -203,8 +222,6 @@ export default {
 
 `setup` 函数接受两个参数，一个是 props，一个是 context。
 
-
-
 #### props
 
 ```js
@@ -230,8 +247,6 @@ export default {
   }
 }
 ```
-
-
 
 #### context
 
@@ -263,8 +278,8 @@ export default {
 
 在 `setup` 函数中，如果要让某个变量变成响应式，则需要通过 `reactive` 或 `ref` 创建并返回变量。
 
-- `ref` 用于对基本值（例如，字符串）创建独立响应式值，**如果要访问或修改变量的值，则需要通过 `.value`**；
-- `reactive` 用于对一个对象创建响应式状态。
+- `reactive` 用于对一个对象创建响应式状态；
+- `ref` 可以为基本值（例如：`String`、`Number` 和 `Boolean`）创建响应式状态， **如果要访问或修改变量的值，则需要通过 `.value`**。
 
 ```vue
 <template>
@@ -280,12 +295,11 @@ export default {
   setup() {
     const count = ref(1)
     console.log(count.value) // 需要通过 .value 访问变量
-    
+
     const person = reactive({
       name: 'Tom',
       age: 20
     })
-    
 
     return {
       count,
@@ -298,11 +312,9 @@ export default {
 
 > Vue 3 支持片段（fragment），即组件支持多根节点，减少了节点的嵌套。Vue 2 中多根节点会报错，为了避免这个问题往往多嵌套一层 `<div>`，增加了页面层级从而增加了开销。
 
-
-
 #### toRefs 解构响应式对象
 
-如果对 `reactive` 创建的响应式对象使用 ES6 解构语法，会使对象失去响应性，解决办法是使用 `toRefs`，可以在解构对象时保留对象属性的响应性，解构出来的属性相当于通过 `ref` 创建的响应式数据，在 `setup` 函数中需要通过 `.value` 访问：
+如果对 `reactive` 创建的响应式对象使用 ES6 解构语法，会使对象失去响应性，解决办法是使用 `toRefs`，可以在解构响应式对象时保留对象属性的响应性，解构出来的属性相当于通过 `ref` 创建的响应式数据，在 `setup` 函数中需要通过 `.value` 访问：
 
 ```js
 import { reactive, toRefs } from 'vue'
@@ -390,9 +402,11 @@ export default {
 
 > 因为 `setup` 是围绕 `beforeCreate` 和 `created` 生命周期钩子运行的，所以不需要显式地定义它们。换句话说，在这些钩子中编写的任何代码都应该直接在 `setup` 函数中编写。
 
+
+
 ### 6. computed
 
-在 Vue 3 中，我们可以在 `setup` 中使用独立的 `computed` 函数来创建计算属性，`computed` 函数接受一个回调函数，返回一个只读的响应式引用，与 `ref` 类似，**我们需要通过 `.value` 访问计算属性的值**：
+在 Vue 3 中，我们可以在 `setup` 中使用独立的 `computed` 函数来创建计算属性，`computed` 函数接受一个 getter 回调函数，`computed` 返回一个只读的响应式引用，与 `ref` 类似，**我们需要通过 `.value` 访问计算属性的值**：
 
 ```vue
 <template>
@@ -411,7 +425,7 @@ export default {
     const onIncrease = () => {
       count.value++
     }
-    
+
     return {
       count,
       doubleCount,
@@ -426,7 +440,7 @@ export default {
 
 ### 7. watch
 
-在 Vue 3 中，在 `setup` 中使用 `watch` 也需要引入，`watch` 函数接受3个参数：
+在 Vue 3 中，在 `setup` 中使用 `watch` 也需要引入，`watch` 函数接受 3 个参数：
 
 - 一个想要侦听的 getter 函数（侦听响应式对象的一个属性）或者 `ref`
 - 一个回调函数，第一个参数表示变化后的值，第二个参数表示旧值
@@ -448,8 +462,6 @@ watch(
   }
 )
 ```
-
-
 
 #### 侦听多个数据源
 
@@ -478,8 +490,6 @@ watch(lastName, (lastName, prevLastName) => {
 })
 ```
 
-
-
 #### 侦听响应式对象
 
 侦听一个响应式对象或数组将始终返回该对象的当前值和上一个状态值的引用。对于一维数组或者没有多层嵌套的对象，可以通过 `...` 扩展运算符返回数组或者对象的副本，如果是多维数组或者多层嵌套的对象，则需要对值进行深拷贝，这可以通过诸如 [lodash.cloneDeep](https://lodash.com/docs/4.17.15#cloneDeep) 这样的实用工具来实现。
@@ -492,11 +502,14 @@ export default {
   setup() {
     const list = reactive([1, 2, 3])
     // 一维数组，使用扩展运算符拷贝数组
-    watch(() => [...list], (list, prevList) => {
-      console.log(list, prevList)
-    })
+    watch(
+      () => [...list],
+      (list, prevList) => {
+        console.log(list, prevList)
+      }
+    )
     list.push(4)
-    
+
     const user = reactive({
       name: {
         firstName: 'Emily',
@@ -505,9 +518,12 @@ export default {
       age: 20
     })
     // 多层嵌套的对象，需要深拷贝
-    watch(() => cloneDeep(user), (user, prevUser) => {
-      console.log(user, prevUser)
-    })
+    watch(
+      () => cloneDeep(user),
+      (user, prevUser) => {
+        console.log(user, prevUser)
+      }
+    )
     user.name.firstName = 'Victoria'
   }
 }
@@ -577,8 +593,6 @@ export default {
 </script>
 ```
 
-
-
 #### 添加响应式
 
 为了增加 `provide` 值和 `inject` 值之间的响应性，我们可以在 `provide` 值时使用 `ref` 或 `reactive`。
@@ -609,8 +623,6 @@ export default {
 </script>
 ```
 
-
-
 #### 修改响应式属性
 
 为了方便维护，建议将对响应式属性的所有修改限制在定义 `provide` 的组件内部。如果需要在注入数据的组件内部更新 `inject` 的数据，建议 `provide` 一个方法来负责改变响应式属性。除此之外，对 `provide` 的属性使用 `readonly`，可以确保数据不会被 `inject` 组件直接修改。
@@ -634,7 +646,7 @@ export default {
       name: 'Tom',
       age: 20
     })
-    const setUserName = name => {
+    const setUserName = (name) => {
       user.name = name
     }
     provide('user', readonly(user))
@@ -918,7 +930,7 @@ table tbody td {
 
 ## 组件自定义事件（emits）
 
-Vue 3 新增 `emits` 选项，用于自定义事件，官方建议定义所有触发的事件，以便更好地记录组件应该如何工作。
+Vue 中，子组件可以通过 `emit` 触发事件，向父组件传递数据。在 Vue 3 中，新增了 `emits` 选项，用于自定义事件，官方建议定义所有触发的事件，以便更好地记录组件应该如何工作。
 
 `emits` 支持数组和对象，使用对象语法可以对事件参数进行验证，如果验证不通过，控制台会发出警告。
 
@@ -945,7 +957,7 @@ export default {
 
 export default {
   setup() {
-    const onOpen = value => {
+    const onOpen = (value) => {
       console.log('onOpen', value)
     }
 
@@ -961,8 +973,6 @@ export default {
   <child-component @open="onOpen"></child-component>
 </template>
 ```
-
-
 
 
 
@@ -1066,17 +1076,12 @@ this.$emit('update:title', newValue)
 Vue 3：
 
 ```vue
-<child-component
-  :title="pageTitle"
-  @update:title="pageTitle = $event"
-/>
+<child-component :title="pageTitle" @update:title="pageTitle = $event" />
 
 <!-- 可简写为： -->
 
 <child-component v-model:title="pageTitle" />
 ```
-
-
 
 ## setup 语法糖
 
@@ -1086,7 +1091,6 @@ Vue 3：
 - 能够使用纯 Typescript 声明 `props` 和抛出事件。
 - 更好的运行时性能 (其模板会被编译成与其同一作用域的渲染函数，没有任何的中间代理)。
 - 更好的 IDE 类型推断性能 (减少语言服务器从代码中抽离类型的工作)。
-
 
 
 
@@ -1105,7 +1109,6 @@ module.exports = {
   }
 }
 ```
-
 
 
 
@@ -1148,9 +1151,7 @@ const onIncrease = () => {
 import ChildComponent from './ChildComponent.vue'
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>
 ```
 
 
@@ -1187,17 +1188,14 @@ const onChange = () => {
 ```vue
 <!-- ParentComponent.vue -->
 <template>
-  <child-component
-    title="标题"
-    :count="1"
-    @change="onChange">
+  <child-component title="标题" :count="1" @change="onChange">
   </child-component>
 </template>
 
 <script setup>
 import ChildComponent from './ChildComponent.vue'
 
-const onChange = value => {
+const onChange = (value) => {
   console.log('接收子组件数据', value)
 }
 </script>
@@ -1217,8 +1215,6 @@ module.exports = {
   }
 }
 ```
-
-
 
 #### TypeScript 中使用
 
@@ -1316,9 +1312,7 @@ export default {
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>
 ```
 
 > 一个 SFC 多个 `<script>` 的 `lang` 值要保持一致（例如都添加 `lang="ts"` 或者都不加），并且只能有一个 `<script>` 标签带 `setup` 属性。
@@ -1376,8 +1370,6 @@ const router = createRouter({
 
 
 
-
-
 ### 2. 路由模式
 
 Vue Router4 不再使用 `mode` 定义路由模式，而是定义对应的模式选项，并通过对应的函数创建模式：
@@ -1388,16 +1380,19 @@ const router = new Router({
   mode: 'hash' // 'hash' | 'history' | 'abstract'
 })
 
-
 // Vue 3
-import { createRouter, createWebHistory, createWebHashHistory, createMemoryHistory } from 'vue-router'
+import {
+  createRouter,
+  createWebHistory,
+  createWebHashHistory,
+  createMemoryHistory
+} from 'vue-router'
 
 const router = createRouter({
   history: createWebHistory()
   // hash: createWebHashHistory()
   // abstract: createMemoryHistory()
 })
-
 ```
 
 
@@ -1435,7 +1430,7 @@ import { useRouter, useRoute } from 'vue'
 export default {
   const router = useRouter()
   const route = useRoute()
-  
+
   router.push('/home')
   const id = route.params.id
 }
@@ -1443,7 +1438,7 @@ export default {
 
 
 
-### 5. 删除了 * 通配符匹配
+### 5. 删除了 \* 通配符匹配
 
 Vue Router4 取消了路由的正则匹配，如果需要匹配未找到的路由，则需要通过 `pathMatch` 参数:
 
@@ -1547,10 +1542,10 @@ import { computed } from 'vue'
 export default {
   setup() {
     const store = useStore()
-    
+
     const counter = computed(() => store.state.counter)
 
-    const onIncrease = n => {
+    const onIncrease = (n) => {
       store.dispatch('Increase', n)
     }
 
@@ -1562,8 +1557,6 @@ export default {
 }
 ```
 
-
-
 ## Pinia（推荐）
 
 [Pinia](https://pinia.vuejs.org/introduction.html) 是 Vue 官方团队开发的 Vue 状态管理的解决方案，Pinia 实现了 Vuex 5 的许多提案，是下一代的 Vuex。
@@ -1573,7 +1566,7 @@ Pinia 相比于 Vuex 3/4，具有以下特点：
 - 去除了 `mutations` ，不再需要通过 `mutations` 这种冗长的方式修改状态。
 - 更好地 TypeScript 支持。
 - 无需手动添加 store，store 创建后会自动添加。
-- 扁平化设计，无嵌套模块，也不需要命名空间，store 之间可以交叉组合使用。 
+- 扁平化设计，无嵌套模块，也不需要命名空间，store 之间可以交叉组合使用。
 
 
 
@@ -1608,14 +1601,10 @@ app.use(createPinia()).mount('#app')
 
 import { defineStore } from 'pinia'
 
-export const useCounterStore = defineStore('counter', {
-
-})
+export const useCounterStore = defineStore('counter', {})
 ```
 
 `defineStore` 函数第一个参数表示 store 的名称，这个值需要唯一。
-
-
 
 #### state
 
@@ -1684,8 +1673,6 @@ export default {
 }
 ```
 
-
-
 #### getters
 
 ```diff
@@ -1736,8 +1723,6 @@ export default {
   }
 }
 ```
-
-
 
 #### actions
 
@@ -1790,19 +1775,17 @@ export default {
 
 
 
-
-
 ## 实战：移动端头条页面
 
 实战内容：实现一个移动端头条页面，包含底部导航和两个主要页面：头条和今日一笑
 
 组件库：[Vant 3]([介绍 - Vant 3 (youzan.github.io)](https://youzan.github.io/vant/#/zh-CN/home))
 
-API：[京东万象API](https://wx.jdcloud.com/api)（部分免费，每天限1000次）
+API：[京东万象 API](https://wx.jdcloud.com/api)（部分免费，每天限 1000 次）
 
 ![news-app](./docs/images/news-app.png)
 
-### 
+##
 
 ### 1. 定义路由
 
@@ -1832,14 +1815,19 @@ export const routes = [
     component: () => import('@/views/news/Detail')
   },
   {
-  	// 每日一笑
+    // 每日一笑
     path: '/joke',
     name: 'Joke',
     component: () => import('@/views/Joke.vue'),
-  	meta: { keepAlive: true, show: true, title: '每日一笑', icon: 'smile-comment-o' }
+    meta: {
+      keepAlive: true,
+      show: true,
+      title: '每日一笑',
+      icon: 'smile-comment-o'
+    }
   },
   {
-  	// 404 页面
+    // 404 页面
     path: '/404',
     name: 'Error404',
     component: () => import('@/views/Error404.vue')
@@ -1906,12 +1894,9 @@ module.exports = {
 创建 `src/plugins/vant.js` 文件，用于定义全局引入组件：
 
 ```js
-import {
-  Button,
-  List
-} from 'vant'
+import { Button, List } from 'vant'
 
-const loadVant = app => {
+const loadVant = (app) => {
   app.use(Button)
   app.use(List)
 }
@@ -1944,11 +1929,12 @@ app.use(createPinia()).use(router).mount('#app')
 ```vue
 <!-- src/components/BottomTabBar.vue -->
 <template>
-  <van-tabbar v-model="activeIndex"  @change="onChange">
+  <van-tabbar v-model="activeIndex" @change="onChange">
     <van-tabbar-item
       v-for="route in tabbarList"
       :key="route.path"
-      :icon="route.meta.icon">
+      :icon="route.meta.icon"
+    >
       {{ route.meta.title }}
     </van-tabbar-item>
   </van-tabbar>
@@ -1965,21 +1951,25 @@ export default {
     const activeIndex = ref(0)
     const router = useRouter()
     const route = useRoute()
-    const tabbarList = routes.filter(route => route.meta?.show)
+    const tabbarList = routes.filter((route) => route.meta?.show)
 
     // 点击切换
-    const onChange = index => {
+    const onChange = (index) => {
       activeIndex.value = index
       router.push(tabbarList[index].path)
     }
     // 根据路由高亮导航
-    watch(() => route.path, newPath => {
-      const index = tabbarList.findIndex(route => route.path === newPath)
-      console.log(newPath, index)
-      if (index >= 0) {
-        activeIndex.value = index
-      }
-    }, { immediate: true })
+    watch(
+      () => route.path,
+      (newPath) => {
+        const index = tabbarList.findIndex((route) => route.path === newPath)
+        console.log(newPath, index)
+        if (index >= 0) {
+          activeIndex.value = index
+        }
+      },
+      { immediate: true }
+    )
 
     return {
       activeIndex,
@@ -2037,9 +2027,11 @@ export default {
   },
   setup() {
     const cachedViewsName = reactive([])
-    const viewsName = routes.filter(route => route.meta?.keepAlive).map(route => route.name)
+    const viewsName = routes
+      .filter((route) => route.meta?.keepAlive)
+      .map((route) => route.name)
     cachedViewsName.push(...viewsName)
-                                        
+
     return {
       cachedViewsName
     }
@@ -2053,7 +2045,7 @@ export default {
 
 ### 5. 封装 axios 和 API
 
-项目中使用到的新闻和每日一笑 API 来自 [京东万象API](https://wx.jdcloud.com/api)，需要注册账号并获取 `appkey`。
+项目中使用到的新闻和每日一笑 API 来自 [京东万象 API](https://wx.jdcloud.com/api)，需要注册账号并获取 `appkey`。
 
 需要安装 axios，用于接口请求：
 
@@ -2076,13 +2068,13 @@ const http = axios.create({
 
 // 请求拦截
 http.interceptors.request.use(
-  config => config,
-  error => Promise.reject(error)
+  (config) => config,
+  (error) => Promise.reject(error)
 )
 
 // 响应拦截
 http.interceptors.response.use(
-  response => {
+  (response) => {
     if (response.data.code === '10000') {
       return response.data.result
     }
@@ -2091,7 +2083,7 @@ http.interceptors.response.use(
     Notify({ type: 'danger', message: msg })
     return Promise.reject(new Error(msg))
   },
-  error => {
+  (error) => {
     // 请求失败提示
     Notify({ type: 'danger', message: '连接失败，请刷新重试' })
     return Promise.reject(error)
@@ -2258,15 +2250,13 @@ export default router
 <!-- src/views/news/Index.vue -->
 <template>
   <van-pull-refresh v-model="refreshing" @refresh="onRefresh">
-    <van-list
-      v-model:loading="loading"
-      :finished="finished"
-      @load="onLoad">
+    <van-list v-model:loading="loading" :finished="finished" @load="onLoad">
       <van-cell
         v-for="(news, index) in list"
         :key="index"
         clickable
-        @click="onViewDetail(news)">
+        @click="onViewDetail(news)"
+      >
         <div class="news">
           <img width="100" height="60" fit="cover" :src="news.pic" />
           <div class="news-title-wrapper">
@@ -2298,7 +2288,7 @@ export default {
     const num = 10
 
     // 加载数据
-    const onLoad = async() => {
+    const onLoad = async () => {
       finished.value = false
       // 下拉刷新
       if (refreshing.value) {
@@ -2330,7 +2320,7 @@ export default {
     // 跳转详情页
     const router = useRouter()
     const newStore = useNewsStore()
-    const onViewDetail = news => {
+    const onViewDetail = (news) => {
       newStore.setNews(news)
       router.push({ path: '/news/detail' })
     }
@@ -2419,10 +2409,7 @@ export default {
 <!-- src/views/Joke.vue -->
 <template>
   <div class="container">
-    <div
-      v-for="joke in jokes"
-      :key="joke.id"
-      class="joke">
+    <div v-for="joke in jokes" :key="joke.id" class="joke">
       <h2 class="joke-title">{{ joke.title }}</h2>
       <p class="joke-time">{{ formatTime(joke.ct) }}</p>
       <p class="joke-content">{{ joke.text }}</p>
@@ -2441,14 +2428,14 @@ export default {
   setup() {
     const jokes = reactive([])
 
-    const onLoad = async() => {
+    const onLoad = async () => {
       const time = format(subDays(new Date(), 1), 'yyyy-MM-dd')
       const res = await getJokes(time)
       const jokeList = res.showapi_res_body.contentlist
       jokes.push(...jokeList)
     }
     // 格式化时间
-    const formatTime = time => {
+    const formatTime = (time) => {
       return time.substring(0, time.indexOf('.'))
     }
 
@@ -2466,13 +2453,15 @@ export default {
 
 
 
-### 10. 404 页面 
+### 10. 404 页面
 
 ```vue
 <!-- src/views/Error404.vue -->
 <template>
   <van-empty image="error" description="抱歉，你所访问的页面不存在">
-    <van-button class="btn" round type="primary" @click="onHome">首页</van-button>
+    <van-button class="btn" round type="primary" @click="onHome"
+      >首页</van-button
+    >
   </van-empty>
 </template>
 ```
@@ -2500,19 +2489,24 @@ export default {
 
 ### 1. TypeScript 教程
 
-- [为什么要用TS](https://mp.weixin.qq.com/s?__biz=MzU1OTgxNDQ1Nw==&mid=2247490348&idx=1&sn=422857d89edf45103f273710444e6796&chksm=fc10d97acb67506c8b2cf7da8d06c6cd77103a7aee51a8588585acaf63e4081e18c608e962bc&mpshare=1&scene=1&srcid=0216LGyzkQtleayJgqlWYhgp&sharer_sharetime=1645085205346&sharer_shareid=eabbe011caf7b25d57818c0c2334124b&version=4.0.0.6007&platform=win#rd)
+- [为什么要用 TS](https://mp.weixin.qq.com/s?__biz=MzU1OTgxNDQ1Nw==&mid=2247490348&idx=1&sn=422857d89edf45103f273710444e6796&chksm=fc10d97acb67506c8b2cf7da8d06c6cd77103a7aee51a8588585acaf63e4081e18c608e962bc&mpshare=1&scene=1&srcid=0216LGyzkQtleayJgqlWYhgp&sharer_sharetime=1645085205346&sharer_shareid=eabbe011caf7b25d57818c0c2334124b&version=4.0.0.6007&platform=win#rd)
 
-
-- [TypeScript中文网](https://www.tslang.cn/index.html)
+- [TypeScript 中文网](https://www.tslang.cn/index.html)
 - [TypeScript 入门教程](http://ts.xcatliu.com/)
 
 
 
 ### 2. 创建 Vue 3 + TypeScript 项目
 
+#### Vue CLI
+
 使用 Vue CLI，创建 Vue 3 项目，并引入 TypeScript：
 
 ![vue-cli-ts-preset](./docs/images/vue-cli-ts-preset.png)
+
+#### Vite
+
+通过 Vite 创建 Vue3 + TypeScript 项目，只需要指定 vue 框架以及 vue-ts 模板即可。
 
 
 
@@ -2522,9 +2516,7 @@ export default {
 <script lang="ts">
 import { defineComponent } from 'vue'
 
-export default defineComponent({
-
-})
+export default defineComponent({})
 </script>
 ```
 
@@ -2560,16 +2552,18 @@ type User = {
   age: number
 }
 
-const user = reactive<User>({
-  name: 'Tom',
-  age: 18
-})
+const user =
+  reactive <
+  User >
+  {
+    name: 'Tom',
+    age: 18
+  }
 // 或
 // const user: User = reactive({
 //   name: 'Tom',
 //   age: 18
 // })
-
 ```
 
 如果其他页面或者组件需要用到 `User` ，建议将 `User` 封装起来，供多个页面使用：
@@ -2599,8 +2593,6 @@ const user = reactive<User>({
 })
 ```
 
-
-
 #### 为函数参数和返回值添加类型
 
 对于函数，特别是导出给外部使用的，为函数参数和返回值添加类型注解，可以方便函数的使用以及避免函数参数类型错误：
@@ -2615,8 +2607,6 @@ const sum = (a: number, b: number) => {
 ![ts_function](./docs/images/ts_function.png)
 
 调用函数时，编辑器会有函数参数和返回值说明，这里的返回值通过类型推断得到。除此之外，还可以得到函数的注释说明。
-
-
 
 #### 封装 axios 请求
 
@@ -2659,7 +2649,11 @@ http.interceptors.response.use(
 // export default http
 
 // 封装GET请求
-export const get = (url: string, params = {}, config: AxiosRequestConfig = {}): AxiosPromise => {
+export const get = (
+  url: string,
+  params = {},
+  config: AxiosRequestConfig = {}
+): AxiosPromise => {
   return http({
     url,
     method: 'GET',
@@ -2669,7 +2663,11 @@ export const get = (url: string, params = {}, config: AxiosRequestConfig = {}): 
 }
 
 // 封装POST请求
-export const post = (url: string, data = {}, config: AxiosRequestConfig = {}): AxiosPromise => {
+export const post = (
+  url: string,
+  data = {},
+  config: AxiosRequestConfig = {}
+): AxiosPromise => {
   return http({
     url,
     method: 'POST',
@@ -2705,29 +2703,46 @@ export const login = (data = {}): AxiosPromise => post('/user/login', data)
 + export const login = (data: LoginParams): AxiosPromise => post('/user/login', data)
 ```
 
-
-
 #### setup 语法糖中使用 defineProps 和 defineEmits
 
 参考上文 《setup 语法糖》中的相关内容。
 
 
 
-#### provide/inject
+### 6. 自动化导入 Vue 3 组合式 API（unplugin-import-auto 插件）
 
-待续。
+可以通过 `unplugin-auto-import` 插件自动化导入组合式 API。
 
+安装插件：
 
+```sh
+npm install unplugin-auto-import -D
+```
 
-#### v-model
+修改 `vite.config.js` 配置文件：
 
-待续。
+```diff
+  import { defineConfig } from 'vite';
+  import vue from '@vitejs/plugin-vue';
++ import AutoImport from 'unplugin-auto-import/vite';
 
+  export default defineConfig({
+    plugins: [
+      vue(),
++     AutoImport({
++       imports: ['vue'],
++       dts: 'src/auto-imports.d.ts'
++     })
++   ]
+  });
+```
 
-
-### 6. unplugin-import-auto 插件
-
-待续。
+```diff
+  <script setup lang="ts">
+- import { ref } = 'vue'; // 不再需要手动导入相关的 API
+  const count = ref(0);
+  </script>
+```
 
 
 
@@ -2740,75 +2755,11 @@ export const login = (data = {}): AxiosPromise => post('/user/login', data)
 - 显示待办项数量和已完成数量
 - 支持删所有已完成待办项
 
-
 ![todo-list](./docs/images/todo-list.png)
 
 
 
-
-#### 1. 引入 reset.css
-
-引入 `reset.css` ，用于覆盖浏览器样式，统一默认样式：
-
-```css
-/* src/styles/reset.css */
-html, body, div, span, applet, object, iframe,
-h1, h2, h3, h4, h5, h6, p, blockquote, pre,
-a, abbr, acronym, address, big, cite, code,
-del, dfn, em, img, ins, kbd, q, s, samp,
-small, strike, strong, sub, sup, tt, var,
-b, u, i, center,
-dl, dt, dd, ol, ul, li,
-fieldset, form, label, legend,
-table, caption, tbody, tfoot, thead, tr, th, td,
-article, aside, canvas, details, embed, 
-figure, figcaption, footer, header, hgroup, 
-menu, nav, output, ruby, section, summary,
-time, mark, audio, video {
-  margin: 0;
-  padding: 0;
-  border: 0;
-  font-size: 100%;
-  font: inherit;
-  vertical-align: baseline;
-}
-/* HTML5 display-role reset for older browsers */
-article, aside, details, figcaption, figure, 
-footer, header, hgroup, menu, nav, section {
-  display: block;
-}
-body {
-  line-height: 1;
-}
-ol, ul {
-  list-style: none;
-}
-blockquote, q {
-  quotes: none;
-}
-blockquote:before, blockquote:after,
-q:before, q:after {
-  content: '';
-  content: none;
-}
-table {
-  border-collapse: collapse;
-  border-spacing: 0;
-}
-```
-
-```diff
-  // src/main.ts
-  import { createApp } from 'vue'
-  import App from './App.vue'
-+ import './styles/reset.css'
-
-  createApp(App).mount('#app')
-```
-
-
-
-#### 2. 引入 Element Plus 组件库
+### 1. 引入 Element Plus 组件库
 
 首先，安装依赖：
 
@@ -2822,57 +2773,82 @@ npm install element-plus
 npm install -D unplugin-vue-components unplugin-auto-import
 ```
 
-```js
-// vue.config.js
-/* eslint-disable @typescript-eslint/no-var-requires */
-const AutoImport = require('unplugin-auto-import/webpack')
-const Components = require('unplugin-vue-components/webpack')
-const { ElementPlusResolver } = require('unplugin-vue-components/resolvers')
-
-module.exports = {
-  configureWebpack: {
-    plugins: [
-      AutoImport({
-        resolvers: [ElementPlusResolver()]
-      }),
-      Components({
-        resolvers: [ElementPlusResolver()]
-      })
-    ]
-  }
-}
-```
-
-
-
-#### 3. 自动化导入 Vue 3 组合式 API
-
-通过 `unplugin-auto-import` 插件可以自动导入 Vue 3 的组合式 API，上一步引入 Element Plus 组件库时已经引入了该插件，不过需要修改配置文件：
+根据所使用的构建工具，修改配置文件：
 
 ```diff
-// vue.config.js
-/* eslint-disable @typescript-eslint/no-var-requires */
-const AutoImport = require('unplugin-auto-import/webpack')
-const Components = require('unplugin-vue-components/webpack')
-const { ElementPlusResolver } = require('unplugin-vue-components/resolvers')
+  // vite.config.ts
+  import { defineConfig } from 'vite'
+  import vue from '@vitejs/plugin-vue'
++ import AutoImport from 'unplugin-auto-import/vite'
++ import Components from 'unplugin-vue-components/vite'
++ import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
 
-module.exports = {
-  configureWebpack: {
+  // https://vitejs.dev/config/
+  export default defineConfig({
     plugins: [
+      vue(),
++     AutoImport({
++       resolvers: [ElementPlusResolver()]
++     }),
++     Components({
++       resolvers: [ElementPlusResolver()]
++     })
+    ]
+  })
+```
+
+
+
+### 2. 类型声明文件
+
+新建 `types` 文件夹，用于统一存放项目中的类型声明文件，我们把默认生成的 `src/env.d.ts` 文件也放到这个文件夹中统一管理。然后修改 `tsconfig.json` ，增加 TS 编译目录和类型声明目录：
+
+```diff
+  {
+    "compilerOptions": {
++     "typeRoots": ["./node_modules/@types/", "./types"]
+    },
+    "include": [
+      "src/**/*.ts",
+      "src/**/*.d.ts",
+      "src/**/*.tsx",
+      "src/**/*.vue",
++     "types/**/*.d.ts"
+    ]
+  }
+```
+
+
+
+### 3. 自动化导入 Vue 3 组合式 API
+
+通过 `unplugin-auto-import` 插件可以自动导入 Vue 3 的组合式 API，之前引入 Element Plus 组件库时已经引入了该插件，不过需要修改配置文件：
+
+```diff
+  // vue.config.js
+  import { defineConfig } from 'vite'
+  import vue from '@vitejs/plugin-vue'
+  import AutoImport from 'unplugin-auto-import/vite'
+  import Components from 'unplugin-vue-components/vite'
+  import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
+
+  // https://vitejs.dev/config/
+  export default defineConfig({
+    plugins: [
+      vue(),
       AutoImport({
-+     	imports: ['vue'],
-+       dts: 'src/auto-imports.d.ts',
++       imports: ['vue'],
++       dts: 'types/auto-imports.d.ts',
         resolvers: [ElementPlusResolver()]
       }),
       Components({
         resolvers: [ElementPlusResolver()]
       })
     ]
-  }
-}
+  })
 ```
 
->  `unplugin-auto-import` 默认会在根路径生成 `auto-imports.d.ts` 配置文件，但是 Vue CLI 生成的 `ts.config.js` 配置文件的`include` 字段默认只包含 `src` 路径和 `tests` 路径，从而导致无法编译成功。因此需要通过 `dts` 指定在 `src` 目录下生成配置文件，或者在 `ts.config.js` 的 `include` 匹配根路径的 `auto-imports.d.ts` 文件。
+`unplugin-auto-import` 默认会在根路径生成 `auto-imports.d.ts` 配置文件，之前我们修改了配置文件 `tsconfig.json`，`include` 字段添加了 `"types/**/*.d.ts"`，所以可以将路径改为 `types/auto-imports.d.ts`。
 
 如果使用 ESlint，需要将 `no-undef` 规则关闭，否则会报错。
 
@@ -2890,15 +2866,13 @@ module.exports = {
 
 
 
-#### 4. 组件划分
+### 4. 组件划分
 
 TodoList 可以划分为三部分：
 
 - 顶部的输入框，用于添加待办项
 - 中间的列表，展示所有待办项，支持删除和完成/取消完成操作
 - 底部，包含统计待办项数量和删除已完成待办项的操作
-
-
 
 ```vue
 <!-- src/components/TodoList/Index.vue -->
@@ -2913,9 +2887,9 @@ TodoList 可以划分为三部分：
 </template>
 
 <script setup lang="ts">
-import TodoListInput from './components/TodoListInput.vue'
-import TodoListItems from './components/TodoListItems.vue'
-import TodoListFooter from './components/TodoListFooter.vue'
+import TodoListInput from './TodoListInput.vue'
+import TodoListItems from './TodoListItems.vue'
+import TodoListFooter from './TodoListFooter.vue'
 </script>
 
 <style scoped>
@@ -2927,7 +2901,7 @@ import TodoListFooter from './components/TodoListFooter.vue'
 
 
 
-#### 5. 添加数据约束
+### 5. 添加数据约束
 
 对于每一条待办项，我们期望以下三个属性：
 
@@ -2936,28 +2910,26 @@ import TodoListFooter from './components/TodoListFooter.vue'
 - `finished` ：`boolean` 类型，表示待办项是否已完成
 
 ```typescript
-// src/components/TodoList/types/TodoListItemType.ts
-type TodoListItemType = {
-  id: string,
-  text: string,
-  finished: boolean,
+// types/todoList.d.ts
+declare type TodoListItemType = {
+  id: string
+  text: string
+  finished: boolean
 }
-
-export default TodoListItemType
 ```
 
-定义一个生成 `id` 的工具方法：
+接着定义一个生成 `id` 的工具方法：
 
 ```typescript
-// src/components/TodoList/utils/getTodoListItemId.ts
+// src/utils/getTodoListItemId.ts
 export default function getTodoListItemId(): string {
-  return (new Date().getTime()) + ''
+  return new Date().getTime() + ''
 }
 ```
 
 
 
-#### 6. Pinia 状态管理
+### 6. Pinia 状态管理
 
 TodoList 的数据处理的核心是维护一个数组，该数组需要在几个兄弟组件之间传递，这里采用 Pinia 进行状态管理。
 
@@ -2974,7 +2946,6 @@ npm install pinia
   import { createApp } from 'vue'
   import App from './App.vue'
 + import { createPinia } from 'pinia'
-  import './styles/reset.css'
 
 - createApp(App).mount('#app')
 + createApp(App).use(createPinia()).mount('#app')
@@ -2985,8 +2956,7 @@ npm install pinia
 ```typescript
 // src/store/index.ts
 import { defineStore } from 'pinia'
-import TodoListItemType from '@/components/TodoList/types/TodoListItemType'
-import getTodoListItemId from '@/components/TodoList/utils/getTodoListItemId'
+import getTodoListItemId from '../utils/getTodoListItemId'
 
 // 约束 state
 type TodoListState = {
@@ -3010,21 +2980,21 @@ export const useTodoListStore = defineStore('todoList', {
     },
     // 修改待办项状态
     changeItemStatus(id: string, finished: boolean): void {
-      const item = this.todoList.find(todoItem => todoItem.id === id)
+      const item = this.todoList.find((todoItem) => todoItem.id === id)
       if (item) {
         item.finished = finished
       }
     },
     // 删除待办项
     removeItem(id: string): void {
-      const index = this.todoList.findIndex(listItem => listItem.id === id)
+      const index = this.todoList.findIndex((listItem) => listItem.id === id)
       if (index >= 0) {
         this.todoList.splice(index, 1)
       }
     },
     // 删除已完成的待办项
     removeFinishedItems(): void {
-      this.todoList = this.todoList.filter(item => !item.finished)
+      this.todoList = this.todoList.filter((item) => !item.finished)
     }
   }
 })
@@ -3032,10 +3002,10 @@ export const useTodoListStore = defineStore('todoList', {
 
 
 
-#### 7. 顶部输入框
+### 7. 顶部输入框
 
 ```vue
-<!-- src/components/TodoList/components/TodoListInput.vue -->
+<!-- src/components/TodoList/TodoListInput.vue -->
 <template>
   <el-row class="input-wrapper" :gutter="12">
     <el-col :span="20">
@@ -3051,7 +3021,7 @@ export const useTodoListStore = defineStore('todoList', {
 </template>
 
 <script setup lang="ts">
-import { useTodoListStore } from '@/store'
+import { useTodoListStore } from '../../store'
 
 const todoListStore = useTodoListStore()
 
@@ -3077,17 +3047,16 @@ const onAddItem = (): void => {
 
 - 待办项非空才能添加。
 - 待办项添加后清空输入框。
-
-
 - 输入框添加键盘监听事件，按回车也可以添加待办项。
 
 
 
 
-#### 8. 待办项列表
+
+### 8. 待办项列表
 
 ```vue
-<!-- src/components/TodoList/components/TodoListItems.vue -->
+<!-- src/components/TodoList/TodoListItems.vue -->
 <template>
   <el-table class="item-table" :data="todoList.reverse()">
     <el-table-column prop="text" label="内容"></el-table-column>
@@ -3096,19 +3065,21 @@ const onAddItem = (): void => {
         <el-button
           :type="row.finished ? 'primary' : 'default'"
           plain
-          @click="onChangeItem(row)">
+          @click="onChangeItem(row)"
+        >
           {{ row.finished ? '取消完成' : '完成' }}
         </el-button>
-        <el-button type="danger" plain @click="onRemoveItem(row)">删除</el-button>
+        <el-button type="danger" plain @click="onRemoveItem(row)"
+          >删除</el-button
+        >
       </template>
     </el-table-column>
   </el-table>
 </template>
 
 <script setup lang="ts">
-import { useTodoListStore } from '@/store'
+import { useTodoListStore } from '../../store'
 import { storeToRefs } from 'pinia'
-import TodoListItemType from '../types/TodoListItemType'
 
 const todoListStore = useTodoListStore()
 const { todoList } = storeToRefs(todoListStore)
@@ -3133,24 +3104,17 @@ const onRemoveItem = (item: TodoListItemType): void => {
 
 
 
-#### 9.底部
+### 9. 底部
 
 ```vue
-<!-- src/components/TodoList/components/TodoListFooter.vue -->
+<!-- src/components/TodoList/TodoListFooter.vue -->
 <template>
-  <el-row
-    v-if="total"
-    class="footer"
-    justify="space-between"
-    align="middle">
+  <el-row v-if="total" class="footer" justify="space-between" align="middle">
     <div>已完成：{{ finishedCount }} / {{ total }}</div>
     <el-button type="danger" @click="onRemoveAll">删除已完成</el-button>
   </el-row>
 
-  <el-dialog
-    v-model="dialogVisible"
-    title="删除"
-    width="400px">
+  <el-dialog v-model="dialogVisible" title="删除" width="400px">
     <div>你确定删除所有已完成的内容吗？</div>
     <template #footer>
       <div>
@@ -3162,18 +3126,19 @@ const onRemoveItem = (item: TodoListItemType): void => {
 </template>
 
 <script setup lang="ts">
-import { useTodoListStore } from '@/store'
+import { useTodoListStore } from '../../store'
 import { storeToRefs } from 'pinia'
-import TodoListItemType from '../types/TodoListItemType'
 
 const todoListStore = useTodoListStore()
 const { todoList } = storeToRefs(todoListStore)
 const dialogVisible = ref<boolean>(false) // 是否展示对话框
 
 const total = computed(() => todoList.value.length)
-const finishedCount = computed(() => todoList.value.reduce((count: number, item: TodoListItemType) => {
-  return item.finished ? count + 1 : count
-}, 0))
+const finishedCount = computed(() =>
+  todoList.value.reduce((count: number, item: TodoListItemType) => {
+    return item.finished ? count + 1 : count
+  }, 0)
+)
 
 const onRemoveAll = (): void => {
   dialogVisible.value = true
@@ -3196,4 +3161,3 @@ const onConfirmRemove = (): void => {
 通过计算属性获取待办项的数量和已完成的数量。
 
 删除已完成的待办项之前，弹出确认对话框。
-
